@@ -6,10 +6,10 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 
 const registerUser = asyncHandler(async (req, res) => {
-    const { fullName, email, username, password } = req.body;
+    const { fullname, email, username, password } = req.body;
 
     if(
-        [fullName, email, username, password].some((field) =>
+        [fullname, email, username, password].some((field) =>
             field?.trim() === ""
     )) {
         throw new ApiError(400, "All fields are required");
@@ -23,21 +23,43 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "User with this email or username already exists");
     }
 
-    const avatarLocalPath = req?.files?.avatar[0]?.path
-    const coverLocalPath = req?.files?.coverImage[0]?.path
+    const avatarLocalPath = req?.files?.avatar?.[0]?.path
+    const coverLocalPath = req?.files?.coverImage?.[0]?.path
 
-    if (!avatarLocalPath){
+    if (!avatarLocalPath) {
         throw new ApiError(400, "Avatar file is missing");
     }
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    /*const avatar = await uploadOnCloudinary(avatarLocalPath);
     let coverImage = "";
 
     if (coverLocalPath) {
         coverImage = await uploadOnCloudinary(coverLocalPath);
-    }
+    }*/
+    
+        let avatar
+        try {
+            avatar = await uploadOnCloudinary(avatarLocalPath);
+            console.log("Avatar uploaded successfully:", avatar);
+        }
+        catch (error) {
+            console.error("Error uploading avatar:", error);
+            throw new ApiError(500, "Failed to upload avatar");
+        }
+
+        let coverImage
+        try {
+            coverImage = await uploadOnCloudinary(coverLocalPath);
+            console.log("cover image uploaded successfully:", coverImage);
+        }
+        catch (error) {
+            console.error("Error uploading cover image:", error);
+            throw new ApiError(500, "Failed to upload cover image");
+        }
+
+        
 
     const user = await User.create({
-        fullName,
+        fullname,
         email,
         username: username.toLowerCase(),
         password,
