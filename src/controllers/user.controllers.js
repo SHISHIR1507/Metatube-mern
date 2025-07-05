@@ -4,6 +4,19 @@ import { User } from "../models/user.models.js";
 import {uploadOnCloudinary,deleteFromCloudinary} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+const generateAccessAndRefreshToken= async (userId)=> {
+    try {
+        const user = await User.findById(userId)
+    
+        const accessToken =user.generateAccessToken()
+        const refreshToken=user.generateRefreshToken()
+    
+        user.refreshToken=refreshToken
+        await user.save ({validateBeforeSave: false})
+    } catch (error) {
+        throw new ApiError(500,"Something went wrong")
+    }
+}
 
 const registerUser = asyncHandler(async (req, res) => {
     const { fullname, email, username, password } = req.body;
