@@ -7,6 +7,10 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 const generateAccessAndRefreshToken= async (userId)=> {
     try {
         const user = await User.findById(userId)
+        //small check to ensure user exists
+        if (!user) {
+            throw new ApiError(404, "User not found");
+        }
     
         const accessToken =user.generateAccessToken()
         const refreshToken=user.generateRefreshToken()
@@ -106,4 +110,44 @@ const registerUser = asyncHandler(async (req, res) => {
     }
     // Logic for registering a user
 });
-export { registerUser };
+
+const loginUser = asyncHandler(async (req, res) => {
+    //get data from request body
+    const { email,username , password } = req.body;
+
+    //validatn
+    if (!email) {
+        throw new ApiError(400,"Email is required")
+    }
+    const user = await User.findOne({
+        $or:[{email},{username}]
+    })
+    if (!user) {
+        throw new ApiError(404, "User not found");
+    }
+
+    //validate password
+    const isPasswordValid = await user.isPasswordCorrect(password);
+    if (!isPasswordValid) {
+        throw new ApiError(400, "Invalid password");
+    }
+    
+    //generate access and refresh token
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
+    .select("-password -refreshToken");
+
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production", // Set to true in production
+    }
+    return res 
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(new ApiResponse(200, 
+        {user: loggedInUser, accessToken, refreshToken},
+        "User logged in successfully"
+    ));
+
+});
+export { registerUser, loginUser };
