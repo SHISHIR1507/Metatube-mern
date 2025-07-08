@@ -1,9 +1,16 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
+
 import {ApiError} from "../utils/ApiError.js";
+
 import { User } from "../models/user.models.js";
+
 import {uploadOnCloudinary,deleteFromCloudinary} from "../utils/cloudinary.js";
+
 import { ApiResponse } from "../utils/ApiResponse.js";
+
 import jwt from "jsonwebtoken";
+
+
 const generateAccessAndRefreshToken= async (userId)=> {
     try {
         const user = await User.findById(userId)
@@ -150,7 +157,9 @@ const loginUser = asyncHandler(async (req, res) => {
     ));
 
 });
-
+const userLogout = asyncHandler(async (req, res) => {
+    await User.findByIdAndUpdate()
+}
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken|| req.body.refreshToken;
     if (!incomingRefreshToken) {
