@@ -3,7 +3,7 @@
   content string
   createdAt Date
   updatedAt Date*/
-import mongoose from 'mongoose';
+import mongoose , {Schema} from 'mongoose';
 const tweetSchema = new Schema(
     {
         content: {

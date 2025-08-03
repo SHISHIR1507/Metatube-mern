@@ -4,7 +4,7 @@
   createdAt Date
   updatedAt Date */
 
-import mongoose  from 'mongoose'
+import mongoose, {Schema}  from 'mongoose'
 const subscriptionSchema=new Schema (
     {
         subscriber:

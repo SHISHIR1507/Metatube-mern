@@ -6,6 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 
 
+
 const generateAccessAndRefreshToken= async (userId)=> {
     try {
         const user = await User.findById(userId)
@@ -135,8 +136,9 @@ const loginUser = asyncHandler(async (req, res) => {
     }
     
     //generate access and refresh token
-    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id)
-    .select("-password -refreshToken");
+    const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
+    const { accessToken, refreshToken } = await generateAccessAndRefreshToken(user._id);
+
 
     const options = {
         httpOnly: true,
