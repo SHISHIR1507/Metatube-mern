@@ -1,6 +1,7 @@
 // controllers/video.controller.js
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { Video } from "../models/video.models.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const uploadVideo = async (req, res) => {
   try {
@@ -115,7 +116,7 @@ export const deleteVideo = async (req, res) => {
   }
 };
 
-const getAllPublishedVideos = asyncHandler(async (req, res) => {
+export const getAllPublishedVideos = asyncHandler(async (req, res) => {
   const videos = await Video.find({ isPublished: true })
     .sort({ createdAt: -1 }) // latest first
     .populate("owner", "username avatar");
@@ -127,7 +128,7 @@ const getAllPublishedVideos = asyncHandler(async (req, res) => {
   });
 });
 
-const getVideoById = asyncHandler(async (req, res) => {
+export const getVideoById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   const video = await Video.findOne({ _id: id, isPublished: true })
